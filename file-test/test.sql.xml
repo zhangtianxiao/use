@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper>
+<!--
+    <insert id="新增用户">
+        with cte as(
+            insert into test(guid, c1, c2) values(gen_random_uuid(), :c1, :c2) returning guid, c1, c2
+        ) update test  set id = nextval('test_seq') from cte where test.guid = cte.guid
+    </insert>
+-->
+    <select id="新增用户">
+        insert into test(guid, c1, c2) values(:guid, coalesce(:c1,1), coalesce(:c2,2)) returning *
+    </select>
+
+    <update id="设置用户主键">
+        update test set id = nextval('test_seq')  where guid = :guid
+    </update>
+
+    <!-- x_系列函数用于查询, 第二个参数为null则不进行比较直接返回true -->
+    <select id="查询用户">
+        select * from test where x_eq(c1,:c1) and x_starts_with(c2,:c2)
+           and x_gt(id,1)
+           and gt(id,1);
+    </select>
+
+    <!-- 全字段更新, 为null保留旧值 -->
+    <insert id="修改用户">
+        update test set c1 = coalesce(:c1,c1), c2 = coalesce(:c2,c2), ver = ver + 1 where id = :id and ver = :ver
+    </insert>
+
+    <!--
+     1. 绝大多数时候, 不再需要动态拼接sql
+     2. ast中如果有其他非text 非output节点, 意味着动态sql
+    -->
+    <sql id="execute">
+     show tables111;
+    </sql>
+</mapper>

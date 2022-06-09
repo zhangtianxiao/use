@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper>
+    <select id="find">
+        select *
+        from test;
+    </select>
+    <select id="find2">
+        select *
+        from public.framework where true
+            #if(name)
+            and name = :name::text
+            #end
+            #if(age)
+            and age &lt;= :age:: int
+            #end
+            #if(name2)
+            and name not like :name2
+            #end
+    </select>
+    <select id="pojo.find">
+        select *
+        from (
+                 select 1::bigint  as id,0::bigint  as fid, '一' as name, '[1,"😀"]'::jsonb as any
+                 union
+                 select 2::bigint as id, 0::bigint as fid, '二' as name, '[2,"😀"]'::jsonb as any
+             ) t
+    </select>
+    <select id="pojo.findOne">
+        select 1::bigint  as id,0::bigint  as fid, '一' as name, '[1,"😀"]'::jsonb as any
+    </select>
+
+    <select id="pojo.children">
+        select *
+        from (
+                 select 3::bigint  as id, 1::bigint  as fid, '三' as name, jsonb_build_object('c1', 1, 'c2', 2) as any
+                 union
+                 select 4::bigint as id, 2::bigint as fid, '四' as name, jsonb_build_object('c1', 1, 'c2', 2) as any
+             ) t
+        where t.fid = #(id)
+    </select>
+    <select id="pojo.others">
+        select * from (
+                          select 5::bigint  as id, 1::bigint  as fid, '五' as name,'[5]'::jsonb as any from generate_series(1,100)
+                          union all
+                          select 6::bigint  as id, 2::bigint  as fid, '六' as name,'[6]'::jsonb as any from generate_series(1,100)
+                      )t where t.fid = #(id)
+    </select>
+    <select id="now">
+        select now()::timestamp
+    </select>
+    <select id="graph.lazy">
+        select * from (
+          select 3::bigint  as id, 1::bigint  as fid, '三' as name,jsonb_build_object('c1',1,'c2',2) as any
+          union
+          select 4::bigint  as id, 2::bigint  as fid, '四' as name,jsonb_build_object('c1',1,'c2',2) as any
+      )t where t.fid = #(id)
+    </select>
+
+    <select id="graph.db1.find">
+        select * from public.t1;
+    </select>
+    <select id="graph.db2.find">
+        select * from public.t2;
+    </select>
+</mapper>

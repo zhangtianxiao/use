@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        div, textarea {
+            width: 100%;
+        }
+
+        div[role] {
+            border: 1px solid black;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+<h1>application/x-www-form-urlencoded; charset=utf-8</h1>
+<textarea role="form-urlencoded"></textarea>
+<div role="form-urlencoded"></div>
+<button role="form-urlencoded">提交</button>
+
+<script>
+    const click = (el, fn) => el.addEventListener('click', fn)
+    const $ = (t, r) => document.querySelector(`${t}[role="${r}"]`)
+
+    $('textarea', 'form-urlencoded').value = `name=张三&id=1&id=2`
+    click($('button', 'form-urlencoded'), async () => {
+        const value = $('textarea', 'form-urlencoded').value;
+        let res = await fetch('/query'
+            , {
+                method   : "post"
+                , headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" }
+                , body   : value
+            });
+
+
+        $('div', 'form-urlencoded').textContent = JSON.stringify(await res.json())
+    });
+
+</script>
+</body>
+</html>
