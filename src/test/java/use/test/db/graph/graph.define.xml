@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<graph-define baes="test.graph.v1">
+    <graph name="入库单" schema="public" table="test" ref="test.find">
+        <int name="id"/>
+        <text name="name"/>
+
+        <timestamp name="now">
+            <ref db="db2" lazy="false" keys="id,name">
+                select now()::timestamp
+            </ref>
+        </timestamp>
+
+        <货物明细 list="true" name="货物明细列表"/>
+    </graph>
+
+    <graph name="货物明细" schema="public" table="test">
+        <field name="id" type="int"/>
+        <field name="fid" type="int"/>
+        <field name="name" type="text"/>
+    </graph>
+
+    <table>
+        <int name="id"/>
+        <text name="name"/>
+        <timestamp name="now"></timestamp>
+    </table>
+
+</graph-define>

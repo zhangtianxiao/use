@@ -1,0 +1,56 @@
+package #(modelPackageName);
+
+import use.db.graph.GraphModel;
+import use.db.BaseModel;
+import use.db.Db;
+
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+#var(modelName=tableMeta.modelName)
+public class #(modelName) extends #if(graph)GraphModel #else BaseModel#end<#(modelName)> {
+    public static final Supplier<#(modelName)> maker = #(modelName)::new;
+    #if(graph)public #(modelName)() { super(0);}
+    public #(modelName)(int n) { super(n);}
+    #end
+  ###public static Function<ResultSet, #(modelName)> toOne = Db.createToOne(#(modelName)::new);
+  ###public static Function<ResultSet, List<#(modelName)>> toList = Db.createToList(#(modelName)::new);
+  #for(cm : tableMeta.columnMetas)
+  public #(cm.javaType) #(cm.attrName);
+  #end
+
+
+
+    @Override
+    protected String schema() {
+      return "#(ignore_schema?tableMeta.schema:'')";
+    }
+
+    @Override
+    protected String table() {
+      return "#(tableMeta.name)";
+    }
+
+    @Override
+    public Long getId() {
+      return id;
+    }
+#for(cm : tableMeta.columnMetas)
+#var(upperName=firstCharToUpperCase(cm.attrName))
+    public #(modelName) set#(upperName)(#(cm.javaType) v) {
+      this.#(cm.attrName) = v;
+      checkAttrs();
+      this.attrs.put("#(cm.attrName)", v);
+      return this;
+    }
+
+    public void remove#(upperName)() {
+      this.#(cm.attrName)=null;
+      this.attrs.remove("#(cm.attrName)");
+    }
+#end
+}
+
+

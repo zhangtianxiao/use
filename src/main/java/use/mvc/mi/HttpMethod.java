@@ -1,0 +1,6 @@
+package use.mvc.mi;
+
+public enum HttpMethod {
+  GET, PUT, POST, HEAD, DELETE, CONNECT, OPTIONS, TRACE, PATCH,
+  SEARCH, COPY, MOVE, LOCK, UNLOCK, MKCOL, PROPFIND, PROPPATCH;
+}

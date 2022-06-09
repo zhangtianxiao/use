@@ -1,0 +1,7 @@
+server:
+  port: 9999
+  netty:
+    server-io-threads: 2
+
+test:
+  val: "Hello World!"

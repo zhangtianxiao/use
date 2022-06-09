@@ -1,0 +1,58 @@
+package #(pkg);
+import use.aop.Invocation;
+import use.aop.proxy.DefaultProxyClassFactory;
+import use.aop.proxy.ProxyMethod;
+import use.aop.Callback;
+
+public class #(name)#(classTypeVars) extends #(targetName)#(targetTypeVars) {
+    public #(name)#(classTypeVars)(#for(y:constructorParaTypes)#(y.type) #(y.name)#(for.last ? "" : ", ")#end)#(throws){
+     super(#for(y:constructorParaTypes)#(y.name)#(for.last ? "" : ", ")#end);
+    }
+#for(x : methodList)
+    public static final ProxyMethod proxyMethod_#(for.index) = DefaultProxyClassFactory.getProxyMethod(#(x.hash));
+
+    ### 调用父类的方法
+	private #(x.methodTypeVars) #(x.returnType) #(x.name)$$callSuper(Invocation inv) #(x.throws){
+	   #(x.frontReturn) super.#(x.name)(#for(y : x.paraTypes)(#(y.type.replace("...", "[]")))inv.args.get(#(for.index))#(for.last ? "" : ",")#end);#if(x.returnType != "void")#(x.backReturn)#end
+
+    }
+
+    ### 静态常量lambda, 用以桥接Invocation
+    public static final Callback CallSuper_#(x.hash) = (inv)->{
+       #(name) it = (#(name))inv.target;
+       ### 展开参数列表, 调用原始方法
+       #(x.frontReturn) it.#(x.name)$$callSuper(inv);#(x.backReturn)
+    };
+
+    ### aop的运行时开销就只有 new Invocation了, 把Invocation池化
+
+    ### 静态常量lambda, 供外部调用, 消解反射开销
+    ### mvc调用
+    #if(x.mvcActon)
+    public static final Callback CallDispel_#(x.hash) = (inv)->{
+       ### 真实调用
+       inv.setCallSuper(CallSuper_#(x.hash));
+       #(targetName) it = (#(targetName))inv.target;
+       ### 执行调用链
+       inv.invoke();
+       return inv.getReturnValue();
+    };
+
+    #else
+    ### service调用
+
+	public #(x.methodTypeVars) #(x.returnType) #(x.name)(#for(y : x.paraTypes)#(y.type) #(y.name)#(for.last ? "" : ", ")#end) #(x.throws){
+		### 在加强方法内填充调用信息
+		Invocation inv = Invocation.pool.get();
+		inv.init(this, proxyMethod_#(for.index).method, proxyMethod_#(for.index).interceptors, CallSuper_#(x.hash));
+		#for(y : x.paraTypes)inv.args.add(#(y.name));#end
+        try{inv.invoke();}finally{ Invocation.pool.recycle(inv); }
+		#if (x.returnType != "void")
+		return inv.getReturnValue();
+		#end
+
+	}
+    #end
+#end
+}
+
