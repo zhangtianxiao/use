@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.expr.Sym;
 import use.template.stat.Location;
@@ -51,29 +52,30 @@ public class Logic extends Expr {
     this.location = location;
   }
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     switch (op) {
       case NOT:
-        return evalNot(scope);
+        return evalNot(scope, env);
       case AND:
-        return evalAnd(scope);
+        return evalAnd(scope, env);
       case OR:
-        return evalOr(scope);
+        return evalOr(scope, env);
       default:
         throw new TemplateException("Unsupported operator: " + op.value(), location);
     }
   }
 
-  Object evalNot(Scope scope) {
-    return !isTrue(right.eval(scope));
+  Object evalNot(Scope scope, Env env) {
+    return !isTrue(right.eval(scope, env));
   }
 
-  Object evalAnd(Scope scope) {
-    return isTrue(left.eval(scope)) && isTrue(right.eval(scope));
+  Object evalAnd(Scope scope, Env env) {
+    return isTrue(left.eval(scope, env)) && isTrue(right.eval(scope, env));
   }
 
-  Object evalOr(Scope scope) {
-    return isTrue(left.eval(scope)) || isTrue(right.eval(scope));
+  Object evalOr(Scope scope, Env env) {
+    return isTrue(left.eval(scope, env)) || isTrue(right.eval(scope, env));
   }
 
   /**

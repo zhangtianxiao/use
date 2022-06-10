@@ -15,14 +15,14 @@ import use.template.stat.Scope;
 import java.util.Iterator;
 
 /**
- * For 循环控制，支持 List、Map、数组、Collection、Iterator、Iterable
- * Enumeration、null 以及任意单个对象的迭代，简单说是支持所有对象迭代
- *
- * 主要用法：
- * 1：#for(item : list) #(item) #end
- * 2：#for(item : list) #(item) #else content #end
- * 3：#for(i=0; i<9; i++) #(item) #end
- * 4：#for(i=0; i<9; i++) #(item) #else content #end
+ For 循环控制，支持 List、Map、数组、Collection、Iterator、Iterable
+ Enumeration、null 以及任意单个对象的迭代，简单说是支持所有对象迭代
+
+ 主要用法：
+ 1：#for(item : list) #(item) #end
+ 2：#for(item : list) #(item) #else content #end
+ 3：#for(i=0; i<9; i++) #(item) #end
+ 4：#for(i=0; i<9; i++) #(item) #else content #end
  */
 public class For extends Stat {
 
@@ -53,13 +53,13 @@ public class For extends Stat {
   }
 
   /**
-   * #for( id : expr)
+   #for( id : expr)
    */
   private void forIterator(Env env, Scope scope, Writer writer) {
     Ctrl ctrl = scope.getCtrl();
     Object outer = scope.get("for");
     ctrl.setLocalAssignment();
-    ForIteratorStatus forIteratorStatus = new ForIteratorStatus(outer, forCtrl.getExpr().eval(scope), location);
+    ForIteratorStatus forIteratorStatus = new ForIteratorStatus(outer, forCtrl.getExpr().eval(scope, env), location);
     ctrl.setWisdomAssignment();
     scope.setLocal("for", forIteratorStatus);
 
@@ -88,7 +88,7 @@ public class For extends Stat {
   }
 
   /**
-   * #for(exprList; cond; update)
+   #for(exprList; cond; update)
    */
   private void forLoop(Env env, Scope scope, Writer writer) {
     Ctrl ctrl = scope.getCtrl();
@@ -101,7 +101,7 @@ public class For extends Stat {
     Expr update = forCtrl.getUpdate();
 
     ctrl.setLocalAssignment();
-    for (init.eval(scope); cond == null || Logic.isTrue(cond.eval(scope)); update.eval(scope)) {
+    for (init.eval(scope, env); cond == null || Logic.isTrue(cond.eval(scope, env)); update.eval(scope, env)) {
       ctrl.setWisdomAssignment();
       stat.exec(env, scope, writer);
       ctrl.setLocalAssignment();

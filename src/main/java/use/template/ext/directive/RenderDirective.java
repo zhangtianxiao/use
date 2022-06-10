@@ -73,11 +73,11 @@ public class RenderDirective extends Directive {
    开启 local assignment 保障 #render 指令参数表达式列表
    中的赋值表达式在当前 scope 中进行，有利于模块化
    */
-  private Object evalAssignExpressionAndGetFileName(Scope scope) {
+  private Object evalAssignExpressionAndGetFileName(Scope scope,Env env) {
     Ctrl ctrl = scope.getCtrl();
     try {
       ctrl.setLocalAssignment();
-      return exprList.evalExprList(scope)[0];
+      return exprList.evalExprList(scope,env)[0];
     } finally {
       ctrl.setWisdomAssignment();
     }
@@ -89,7 +89,7 @@ public class RenderDirective extends Directive {
     Scope scope = scopeFactory.get();
     scope.init(parent);
     try {
-      Object value = evalAssignExpressionAndGetFileName(scope);
+      Object value = evalAssignExpressionAndGetFileName(scope,env);
       if (!(value instanceof String)) {
         throw new TemplateException("The parameter value of #render directive must be String", location);
       }

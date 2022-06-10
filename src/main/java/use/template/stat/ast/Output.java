@@ -12,12 +12,12 @@ import use.template.stat.ParseException;
 import use.template.stat.Scope;
 
 /**
- * Output 输出指令
- *
- * 用法：
- * 1：#(value)
- * 2：#(x = 1, y = 2, x + y)
- * 3：#(seoTitle ?? 'JFinal 极速开发社区')
+ Output 输出指令
+
+ 用法：
+ 1：#(value)
+ 2：#(x = 1, y = 2, x + y)
+ 3：#(seoTitle ?? 'JFinal 极速开发社区')
  */
 public class Output extends Stat {
 
@@ -32,7 +32,7 @@ public class Output extends Stat {
 
   public void exec(Env env, Scope scope, Writer writer) {
     try {
-      Object value = expr.eval(scope);
+      Object value = expr.eval(scope, env);
       writer.writeVar(value);
       /*if (value instanceof String) {
         String str = (String) value;
@@ -62,12 +62,16 @@ public class Output extends Stat {
     }
   }
 
+  public Object eval(Scope scope, Env env) {
+    return expr.eval(scope, env);
+  }
+
   public Object eval(Scope scope) {
-    return expr.eval(scope);
+    return expr.eval(scope, null);
   }
 
   public Object eval() {
-    return expr.eval(null);
+    return expr.eval(null,null);
   }
 }
 

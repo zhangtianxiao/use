@@ -8,6 +8,6 @@ import use.template.stat.Scope;
 public class WriterDirective extends Directive {
   @Override
   public void exec(Env env, Scope scope, Writer writer) {
-    writer.writeVal(exprList.eval(scope));
+    writer.writeVal(exprList.eval(scope, env));
   }
 }

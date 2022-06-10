@@ -9,7 +9,6 @@ import use.template.EngineConfig;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -27,12 +26,12 @@ public class Scope {
     return true;
   };
 
-  public Map data;
-  public Map innerData = new HashMap();
-  private Scope parent;
+  private Map data;
   private Ctrl ctrl;
+
+  private final Map innerData = new HashMap();
+  private Scope parent;
   private Map<String, Object> sharedObjectMap;
-  public Beans beans;
 
   public Scope() {
     //log.info("scope 创建: " + this.getClass() + " " + System.identityHashCode(this));
@@ -42,23 +41,17 @@ public class Scope {
   public void init(Scope parent) {
     // log.debug("scope init by parent : "+this.getClass()+" "+System.identityHashCode(this));
     this.data = innerData;
-    //this.data = parent.data;
-
     this.ctrl = parent.ctrl;
     this.parent = parent;
     this.sharedObjectMap = parent.sharedObjectMap;
-    this.beans = parent.beans;
   }
 
   public void init(@NotNull Map data, EngineConfig config) {
     //log.debug("scope init by config: "+this.getClass()+" "+System.identityHashCode(this));
-
     this.data = data;
-
     this.ctrl = new Ctrl();
     this.parent = null;
     this.sharedObjectMap = config.getSharedObjectMap();
-    this.beans = config.beans;
   }
 
   public void clear() {
@@ -68,7 +61,6 @@ public class Scope {
     this.ctrl = null;
     this.parent = null;
     this.sharedObjectMap = null;
-    this.beans = null;
   }
 
   public Ctrl getCtrl() {

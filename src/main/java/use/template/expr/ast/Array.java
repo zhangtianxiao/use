@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
 import use.template.stat.Scope;
@@ -26,10 +27,11 @@ public class Array extends Expr {
     this.exprList = exprList;
   }
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     List<Object> array = new ArrayListExt(exprList.length);
     for (Expr expr : exprList) {
-      array.add(expr.eval(scope));
+      array.add(expr.eval(scope, env));
     }
     return array;
   }

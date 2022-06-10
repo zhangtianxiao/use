@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.expr.Sym;
 import use.template.stat.Location;
@@ -48,7 +49,7 @@ public class Arith extends Expr {
       // 两侧都是常量
       isConst = left instanceof Arith && ((Arith) left).isConst && right instanceof Const;
     if (isConst)
-      value = doEval(null);
+      value = doEval(null, null);
     else
       value = null;
     this.location = location;
@@ -83,11 +84,12 @@ public class Arith extends Expr {
   }
 
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     if (isConst)
       return value;
     try {
-      return doEval(scope);
+      return doEval(scope, env);
     } catch (TemplateException e) {
       throw e;
     } catch (Exception e) {
@@ -96,9 +98,9 @@ public class Arith extends Expr {
   }
 
 
-  private Object doEval(Scope scope) {
-    Object leftValue = left.eval(scope);
-    Object rightValue = right.eval(scope);
+  private Object doEval(Scope scope, Env env) {
+    Object leftValue = left.eval(scope, env);
+    Object rightValue = right.eval(scope, env);
 /*
    if (true) {
       final BigDecimal l = (BigDecimal) leftValue;

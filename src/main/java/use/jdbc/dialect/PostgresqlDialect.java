@@ -2,15 +2,14 @@ package use.jdbc.dialect;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jsoniter.any.Any;
-import org.postgresql.core.Field;
 import org.postgresql.core.Oid;
+import org.postgresql.jdbc.PGHelper;
 import org.postgresql.jdbc.PgResultSetMetaData;
 import org.postgresql.util.PGobject;
 import use.jdbc.ActiveRecordException;
-import use.sql.SqlParaWriter;
 import use.kit.ex.Unsupported;
+import use.sql.SqlParaWriter;
 import use.template.io.TextWriter;
-import use.kit.ReflectKit;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -162,15 +161,6 @@ public class PostgresqlDialect extends Dialect {
     return v;
   }
 
-  protected static java.lang.reflect.Field FieldsField = ReflectKit.getField(PgResultSetMetaData.class, "fields");
-
-  public static int oid(PgResultSetMetaData md, int c) throws SQLException {
-    // 如果pg驱动这里放开, 就不用反射了
-    Field[] fields = as(ReflectKit.getFieldValue(md, FieldsField));
-    Field field = fields[c - 1];
-    return field.getOID();
-  }
-
 
   /**
    *
@@ -178,7 +168,7 @@ public class PostgresqlDialect extends Dialect {
   @Override
   public Object convertForRead(ResultSet rs, int c) throws SQLException {
     PgResultSetMetaData md = as(rs.getMetaData());
-    int ct = oid(md, c);
+    int ct = PGHelper.get(md, c).getOID();
     //int ct = md.getColumnType(c);
     if (ct == Oid.TEXT || ct == Oid.VARCHAR)
       return rs.getString(c);
@@ -244,7 +234,7 @@ public class PostgresqlDialect extends Dialect {
    社区分享：《Oracle NUMBER 类型映射改进》https://jfinal.com/share/1145
    */
   public String handleJavaType(ResultSetMetaData rsmd, int c) throws SQLException {
-    int ct = oid(as(rsmd), c);
+    int ct = PGHelper.get(as(rsmd), c).getOID();
 
     if (ct == Oid.INT4)
       return "java.lang.Integer";

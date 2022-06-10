@@ -63,7 +63,7 @@ public class Template {
 
   @Nullable
   public Object eval() {
-    return output.eval();
+    return output.eval(null, env);
     //return  a+b;
   }
 
@@ -74,7 +74,7 @@ public class Template {
     Scope scope = scopePool.get();
     scope.init(data, engineConfig);
     try {
-      return output.eval(scope);
+      return output.eval(scope, env);
     } finally {
       scopePool.recycle(scope);
     }
@@ -117,9 +117,13 @@ public class Template {
   }
 
   public String renderToString(@NotNull Map<?, ?> data) {
-    TextWriter textWriter = new TextWriter();
-    render(data, textWriter);
-    return textWriter.toUTF8();
+    TextWriter textWriter = TextWriter.pool.get();
+    try {
+      render(data, textWriter);
+      return textWriter.toUTF8();
+    } finally {
+      TextWriter.pool.recycle(textWriter);
+    }
   }
 
   @Nullable

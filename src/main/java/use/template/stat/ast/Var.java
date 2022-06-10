@@ -39,7 +39,7 @@ public class Var extends Stat {
 	
 	public void exec(Env env, Scope scope, Writer writer) {
 		scope.getCtrl().setWisdomAssignment();
-		expr.eval(scope);
+		expr.eval(scope,env);
 	}
 }
 

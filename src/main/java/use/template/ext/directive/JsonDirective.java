@@ -12,7 +12,7 @@ import java.io.IOException;
 public class JsonDirective extends Directive {
   @Override
   public void exec(Env env, Scope scope, Writer writer) {
-    Object obj = exprList.eval(scope);
+    Object obj = exprList.eval(scope,env);
     JsonStream jsonStream = new JsonStream(writer, 1024);
     try {
       jsonStream.writeVal(obj);

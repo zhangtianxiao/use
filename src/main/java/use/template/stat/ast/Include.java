@@ -133,7 +133,7 @@ public class Include extends Stat {
     scope.init(parent);
     try {
       if (assignArray != null) {
-        evalAssignExpression(scope);
+        evalAssignExpression(scope, env);
       }
       stat.exec(env, scope, writer);
       scope.getCtrl().setJumpNone();
@@ -143,12 +143,12 @@ public class Include extends Stat {
 
   }
 
-  private void evalAssignExpression(Scope scope) {
+  private void evalAssignExpression(Scope scope, Env env) {
     Ctrl ctrl = scope.getCtrl();
     try {
       ctrl.setLocalAssignment();
       for (Assign assign : assignArray) {
-        assign.eval(scope);
+        assign.eval(scope, env);
       }
     } finally {
       ctrl.setWisdomAssignment();

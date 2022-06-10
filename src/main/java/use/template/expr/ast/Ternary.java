@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
 import use.template.stat.Scope;
@@ -27,8 +28,9 @@ public class Ternary extends Expr {
     this.location = location;
   }
 
-  public Object eval(Scope scope) {
-    return Logic.isTrue(cond.eval(scope)) ? exprOne.eval(scope) : exprTwo.eval(scope);
+  @Override
+public Object eval(Scope scope, Env env) {
+    return Logic.isTrue(cond.eval(scope,env)) ? exprOne.eval(scope,env) : exprTwo.eval(scope,env);
   }
 }
 

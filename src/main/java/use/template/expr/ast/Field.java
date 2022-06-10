@@ -4,6 +4,7 @@ package use.template.expr.ast;
 
 import use.beans.FieldDesc;
 import use.beans.FieldKeyBuilder;
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -37,8 +38,9 @@ public class Field extends Expr {
     this.location = location;
   }
 
-  public Object eval(Scope scope) {
-    Object target = expr.eval(scope);
+  @Override
+  public Object eval(Scope scope, Env env) {
+    Object target = expr.eval(scope, env);
     if (target == null) {
       if (scope.getCtrl().isNullSafe()) {
         return null;
@@ -51,7 +53,7 @@ public class Field extends Expr {
     }
 
 
-    FieldDesc<Object> desc = scope.beans.desc(target, fieldNameHash);
+    FieldDesc<Object> desc = env.config.beans.desc(target, fieldNameHash);
     try {
       if (desc != null)
         return desc.getter.get(target);

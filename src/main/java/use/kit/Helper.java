@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -285,6 +286,9 @@ public class Helper {
 
     JdkOffsetTimeSupport.enable();
     JdkOffsetDateTimeSupport.enable();
+
+    MaybeStringBigDecimalDecoder.enable();
+
 
     JacksonSupport.enable();
 

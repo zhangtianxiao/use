@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -11,7 +12,8 @@ import java.util.List;
 /**
  index : 赋值表达式
 
- 支持 a[i]、 a[b[i]]、a[i][j]、a[i][j]...[n] */
+ 支持 a[i]、 a[b[i]]、a[i][j]、a[i][j]...[n]
+ */
 public class Index extends Expr {
 
   private final Expr expr;
@@ -27,8 +29,9 @@ public class Index extends Expr {
   }
 
   @SuppressWarnings("rawtypes")
-  public Object eval(Scope scope) {
-    Object target = expr.eval(scope);
+  @Override
+  public Object eval(Scope scope, Env env) {
+    Object target = expr.eval(scope, env);
     if (target == null) {
       if (scope.getCtrl().isNullSafe()) {
         return null;
@@ -36,7 +39,7 @@ public class Index extends Expr {
       throw new TemplateException("The index access operation target can not be null", location);
     }
 
-    Object idx = index.eval(scope);
+    Object idx = index.eval(scope, env);
     if (idx == null) {
       if (scope.getCtrl().isNullSafe()) {
         return null;
@@ -44,8 +47,7 @@ public class Index extends Expr {
 
       if (target instanceof java.util.Map) {
         // Map 的 key 可以是 null，不能抛异常
-      }
-      else {
+      } else {
         throw new TemplateException("The index of list and array can not be null", location);
       }
     }
@@ -69,12 +71,11 @@ public class Index extends Expr {
     }
     String fieldName = (String) idx;
     try {
-      Object resolve = scope.beans.get(target, fieldName);
+      Object resolve = env.config.beans.get(target, fieldName);
       if (resolve == null)
         if (scope.getCtrl().isNullSafe()) {
           return null;
-        }
-        else
+        } else
           throw new TemplateException("Only the list array and map is supported by index access", location);
       return resolve;
     } catch (TemplateException | ParseException e) {

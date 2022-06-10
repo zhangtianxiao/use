@@ -2,6 +2,7 @@ package use.jdbc;
 
 import cn.hutool.core.util.ClassUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jsoniter.output.JsonStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import use.template.io.TextWriter;
 import use.kit.Helper;
 import use.kit.Kv;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.temporal.Temporal;
@@ -43,12 +45,47 @@ public class Db {
   }
 
 
-  public static RsHandler toObject = new RsHandler() {
+  public static final RsHandler toObject = new RsHandler() {
     @Override
     public Object run(ResultSet rs, Dialect dialect, Object atta, int n) throws SQLException {
       if (rs.next())
         return dialect.convertForRead(rs, 1);
       else return null;
+    }
+  };
+
+  public static final RsHandler to2dArray = new RsHandler() {
+    @Override
+    public Object run(ResultSet rs, Dialect dialect, Object atta, int n) throws SQLException {
+      JsonStream stream = (JsonStream) atta;
+      boolean next = rs.next();
+      boolean first = true;
+      // [ [], [] ]
+      do {
+        try {
+          if (next) {
+            ResultSetMetaData md = rs.getMetaData();
+            int cn = md.getColumnCount();
+            if (first) first = false;
+            else stream.writeMore();
+            stream.writeArrayStart();
+            for (int i = 1; i <= cn; i++) {
+              stream.writeArrayStart();
+              Object value = dialect.convertForRead(rs, i);
+              if (i != 1)
+                stream.writeMore();
+              stream.writeVal(value);
+              stream.writeArrayEnd();
+            }
+            stream.writeArrayEnd();
+          } else {
+            stream.writeEmptyArray();
+          }
+        } catch (IOException e) {
+          throw ActiveRecordException.wrapEx(e);
+        }
+      } while (rs.next());
+      return null;
     }
   };
 

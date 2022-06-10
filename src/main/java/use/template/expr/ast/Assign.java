@@ -4,6 +4,8 @@ package use.template.expr.ast;
 
 import use.beans.FieldDesc;
 import use.beans.FieldKeyBuilder;
+import use.template.EngineConfig;
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -79,16 +81,17 @@ public class Assign extends Expr {
   /**
    赋值语句有返回值，可以用于表达式计算
    */
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     if (index == null) {
-      return assignVariable(scope);
+      return assignVariable(scope, env);
     } else {
-      return assignElement(scope);
+      return assignElement(scope, env);
     }
   }
 
-  Object assignVariable(Scope scope) {
-    Object rightValue = right.eval(scope);
+  Object assignVariable(Scope scope, Env env) {
+    Object rightValue = right.eval(scope, env);
     if (scope.getCtrl().isWisdomAssignment()) {
       scope.set(id, rightValue);
     } else if (scope.getCtrl().isLocalAssignment()) {
@@ -104,19 +107,19 @@ public class Assign extends Expr {
    数组或 Map 赋值
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  Object assignElement(Scope scope) {
+  Object assignElement(Scope scope, Env env) {
     Object target = scope.get(id);
     if (target == null) {
       throw new TemplateException("assigned targets \"" + id + "\" can not be null", location);
     }
-    Object idx = index.eval(scope);
+    Object idx = index.eval(scope, env);
     if (idx == null) {
       throw new TemplateException("assigned key of map can not be null", location);
     }
 
     Object value;
     if (target instanceof Map) {
-      value = right.eval(scope);
+      value = right.eval(scope, env);
       ((Map) target).put(idx, value);
       return value;
     }
@@ -128,10 +131,10 @@ public class Assign extends Expr {
       //scope.fg.getFieldGetter()
       String fieldName = (String) idx;
       try {
-        value = right.eval(scope);
+        value = right.eval(scope, env);
         long fieldNameHash = index instanceof Const ? ((Const) index).fnv1a64 : FieldKeyBuilder.me.fieldHash(fieldName);
         //long fieldNameHash = HashKit.fnv1a64(fieldName);
-        FieldDesc fieldDesc = scope.beans.desc(target, fieldNameHash);
+        FieldDesc fieldDesc = env.config.beans.desc(target, fieldNameHash);
         if (fieldDesc != null)
           return fieldDesc.setter.set(target, value);
         else
@@ -144,12 +147,12 @@ public class Assign extends Expr {
     }
 
     if (target instanceof List) {
-      value = right.eval(scope);
+      value = right.eval(scope, env);
       ((List) target).set((Integer) idx, value);
       return value;
     }
     if (target.getClass().isArray()) {
-      value = right.eval(scope);
+      value = right.eval(scope, env);
       java.lang.reflect.Array.set(target, (Integer) idx, value);
       return value;
     }

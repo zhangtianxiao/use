@@ -14,20 +14,20 @@ import use.template.stat.ParseException;
 import use.template.stat.Scope;
 
 /**
- * Define 定义模板函数：
- * #define funcName(p1, p2, ..., pn)
- *   body
- * #end
- *
- * 模板函数类型：
- * 1：全局共享的模板函数
- *   通过 engine.addSharedFunction(...) 添加，所有模板中可调用
- * 2：模板中定义的局部模板函数
- *   在模板中定义的模板函数，只在本模板中有效
- *
- * 高级用法：
- * 1：局部模板函数可以与全局共享模板函数同名，调用时优先调用模板内模板数
- * 2：模板内部不能定义同名的局部模板函数
+ Define 定义模板函数：
+ #define funcName(p1, p2, ..., pn)
+ body
+ #end
+
+ 模板函数类型：
+ 1：全局共享的模板函数
+ 通过 engine.addSharedFunction(...) 添加，所有模板中可调用
+ 2：模板中定义的局部模板函数
+ 在模板中定义的模板函数，只在本模板中有效
+
+ 高级用法：
+ 1：局部模板函数可以与全局共享模板函数同名，调用时优先调用模板内模板数
+ 2：模板内部不能定义同名的局部模板函数
  */
 public class Define extends Stat {
 
@@ -67,14 +67,14 @@ public class Define extends Stat {
   }
 
   /**
-   * Define 的继承类可以覆盖此方法实现一些 register 类的动作
+   Define 的继承类可以覆盖此方法实现一些 register 类的动作
    */
   public void exec(Env env, Scope scope, Writer writer) {
 
   }
 
   /**
-   * 真正调用模板函数
+   真正调用模板函数
    */
   public void call(Env env, Scope parent, ExprList exprList, Writer writer) {
     if (exprList.length() != parameterNames.length) {
@@ -85,7 +85,7 @@ public class Define extends Stat {
     scope.init(parent);
     try {
       if (exprList.length() > 0) {
-        Object[] parameterValues = exprList.evalExprList(scope);
+        Object[] parameterValues = exprList.evalExprList(scope, env);
         for (int i = 0; i < parameterValues.length; i++) {
           scope.setLocal(parameterNames[i], parameterValues[i]);  // 参数赋值
         }
@@ -113,8 +113,8 @@ public class Define extends Stat {
   // -----------------------------------------------------------------------
 
   /**
-   * envForDevMode 属性以及相关方法仅用于 devMode 判断当前 #define 指令所在资源是否被修改
-   * 仅用于 EngineConfig 中处理 shared function 的逻辑
+   envForDevMode 属性以及相关方法仅用于 devMode 判断当前 #define 指令所在资源是否被修改
+   仅用于 EngineConfig 中处理 shared function 的逻辑
    */
   private Env envForDevMode;
 

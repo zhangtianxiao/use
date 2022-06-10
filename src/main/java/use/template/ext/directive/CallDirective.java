@@ -65,7 +65,7 @@ public class CallDirective extends Directive {
 	}
 	
 	public void exec(Env env, Scope scope, Writer writer) {
-		Object funcNameValue = funcNameExpr.eval(scope);
+		Object funcNameValue = funcNameExpr.eval(scope,env);
 		if (funcNameValue == null) {
 			if (nullSafe) {
 				return ;

@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -37,12 +38,13 @@ public class RangeArray extends Expr {
     this.location = location;
   }
 
-  public Object eval(Scope scope) {
-    Object startValue = start.eval(scope);
+  @Override
+  public Object eval(Scope scope, Env env) {
+    Object startValue = start.eval(scope, env);
     if (!(startValue instanceof Integer)) {
       throw new TemplateException("The start value of range array must be Integer", location);
     }
-    Object endValue = end.eval(scope);
+    Object endValue = end.eval(scope, env);
     if (!(endValue instanceof Integer)) {
       throw new TemplateException("The end value of range array must be Integer", location);
     }

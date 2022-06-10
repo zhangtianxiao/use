@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.expr.Sym;
 import use.template.stat.Location;
@@ -33,8 +34,9 @@ public class Unary extends Expr {
   /**
    unary : ('!' | '+' | '-'| '++' | '--') expr
    */
-  public Object eval(Scope scope) {
-    Object value = expr.eval(scope);
+  @Override
+  public Object eval(Scope scope, Env env) {
+    Object value = expr.eval(scope, env);
     if (value == null) {
       if (scope.getCtrl().isNullSafe()) {
         return null;

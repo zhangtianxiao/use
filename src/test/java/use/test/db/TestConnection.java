@@ -26,6 +26,7 @@ public class TestConnection {
         return null;
       });
     }).start();
+
     new Thread(() -> {
       db.holdConnection((conn) -> {
         // 两个线程各自一条连接

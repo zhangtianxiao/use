@@ -38,7 +38,7 @@ public class SetGlobal  extends Stat {
 		Ctrl ctrl = scope.getCtrl();
 		try {
 			ctrl.setGlobalAssignment();
-			expr.eval(scope);
+			expr.eval(scope,env);
 		} finally {
 			ctrl.setWisdomAssignment();
 		}

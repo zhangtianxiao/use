@@ -49,7 +49,7 @@ import use.template.stat.Scope;
  */
 public class Switch extends Stat implements CaseSetter {
 	
-	private Expr expr;
+	private final Expr expr;
 	private Case nextCase;
 	private Default _default;
 	
@@ -72,7 +72,7 @@ public class Switch extends Stat implements CaseSetter {
 	}
 	
 	public void exec(Env env, Scope scope, Writer writer) {
-		Object switchValue = expr.eval(scope);
+		Object switchValue = expr.eval(scope,env);
 		
 		if (nextCase != null && nextCase.execIfMatch(switchValue, env, scope, writer)) {
 			return ;

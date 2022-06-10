@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.stat.Ctrl;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -30,13 +31,14 @@ public class NullSafe extends Expr {
     this.location = location;
   }
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     Ctrl ctrl = scope.getCtrl();
     boolean oldNullSafeValue = ctrl.isNullSafe();
 
     try {
       ctrl.setNullSafe(true);
-      Object ret = left.eval(scope);
+      Object ret = left.eval(scope, env);
       if (ret != null) {
         return ret;
       }
@@ -45,7 +47,7 @@ public class NullSafe extends Expr {
     }
 
     // right 表达式处于 null safe 区域之外
-    return right != null ? right.eval(scope) : null;
+    return right != null ? right.eval(scope, env) : null;
   }
 }
 

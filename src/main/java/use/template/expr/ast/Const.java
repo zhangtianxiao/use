@@ -2,6 +2,7 @@
 package use.template.expr.ast;
 
 import use.kit.HashKit;
+import use.template.Env;
 import use.template.expr.Sym;
 import use.template.stat.Scope;
 
@@ -29,7 +30,8 @@ public class Const extends Expr {
     this.fnv1a64 = value instanceof String ? HashKit.fnv1a64((String) value) : 0;
   }
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     return value;
   }
 

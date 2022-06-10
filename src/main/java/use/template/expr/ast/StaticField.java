@@ -1,6 +1,7 @@
 
 package use.template.expr.ast;
 
+import use.template.Env;
 import use.template.TemplateException;
 import use.template.stat.Location;
 import use.template.stat.ParseException;
@@ -30,7 +31,8 @@ public class StaticField extends Expr {
     }
   }
 
-  public Object eval(Scope scope) {
+  @Override
+  public Object eval(Scope scope, Env env) {
     try {
       return field.get(null);
     } catch (Exception e) {

@@ -35,7 +35,7 @@ public class ElseIf extends Stat {
 	}
 	
 	public void exec(Env env, Scope scope, Writer writer) {
-		if (Logic.isTrue(cond.eval(scope))) {
+		if (Logic.isTrue(cond.eval(scope,env))) {
 			stat.exec(env, scope, writer);
 		} else if (elseIfOrElse != null) {
 			elseIfOrElse.exec(env, scope, writer);

@@ -1,16 +1,24 @@
 package use.template.io;
 
+import use.kit.ObjectPool;
 import use.kit.ex.Unsupported;
 
 import java.math.BigDecimal;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TextWriter extends Writer {
   public static final Supplier<TextWriter> maker = TextWriter::new;
-  public static final Consumer<TextWriter> clearer = TextWriter::reset;
+  public static final Function<TextWriter, Boolean> clearer = it -> {
+    it.reset();
+    return true;
+  };
+  public static final ObjectPool<TextWriter> pool = ObjectPool.create("TextWriter", TextWriter.maker, TextWriter.clearer, -1);
+  private final StringBuilder sb = new StringBuilder();
 
-  public final StringBuilder sb = new StringBuilder();
+  private TextWriter() {
+  }
 
   public void writeWithQuote(String v) {
     writeVal("\"");
